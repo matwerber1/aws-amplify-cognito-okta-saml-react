@@ -1,6 +1,8 @@
 import './App.css';
 
 import React, { useEffect, useState } from 'react';
+import {AmplifyAuthenticator, AmplifySignIn, AmplifySignOut} from "@aws-amplify/ui-react";
+import { AuthState, onAuthUIStateChange } from '@aws-amplify/ui-components';
 
 import Amplify, { Auth, Hub } from 'aws-amplify'
 import awsconfig from './awsconfig'
@@ -27,56 +29,36 @@ Hub.listen('auth', ({ payload: { event, data } }) => {
 
 function App() {
   
-  const [signedIn, setSignedIn] = useState(false);
-  const [user, setUser] = useState({});
+  const [authState, setAuthState] = React.useState();
+    const [user, setUser] = React.useState();
 
-  useEffect(() => {
-    Auth.currentAuthenticatedUser()
-    .then(user => {
-      console.log('Signed in');
-      setSignedIn(true);
-      setUser(user);
-    })
-    .catch(() => {
-      console.log('Not signed in');
-      setSignedIn(false);
-      setUser({});
-    })
-  }, []);
+    React.useEffect(() => {
+        return onAuthUIStateChange((nextAuthState, authData) => {
+            setAuthState(nextAuthState);
+            setUser(authData)
+        });
+    }, []);
 
-  return (
-    <div className="App">
-        {
-          signedIn
-          ?
-            <LogoutButton user={user}/>
-          :
-            <LoginButton/>
-        }
-    </div>
+  return authState === AuthState.SignedIn && user ? (
+      <div className="App">
+          <div>Hello, {user.username}</div>
+          <AmplifySignOut />
+      </div>
+    ) : (
+      <AmplifyAuthenticator>
+        <div slot="sign-in">
+          <AmplifySignIn hideSignUp={true}>
+            <div slot="federated-buttons">
+              <button onClick={() => Auth.federatedSignIn()}>
+                Click here to sign in with Okta
+              </button>
+              <hr />
+            </div>
+          </AmplifySignIn>
+        </div>
+      </AmplifyAuthenticator>
   );
-}
-
-export const LoginButton = () => {
   
-  return (
-    <div>
-      <p>You are not signed in.</p>
-      <button onClick={() => Auth.federatedSignIn()}>Login to Hosted UI</button>
-    </div>
-  )
-}
-
-export const LogoutButton = (props) => {
-  
-  console.log(`User: ${JSON.stringify(props.user,null,2)}`)
-
-  return (
-    <div>
-      <p>You are signed in as Cognito User Pool ID {props.user.username}</p>
-      <button onClick={() => Auth.signOut()}>Sign out</button>
-    </div>
-  )
 }
 
 export default App;
