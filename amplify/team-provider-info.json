@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-oktaamplify-dev-150457-authRole",
+      "UnauthRoleArn": "arn:aws:iam::544941453660:role/amplify-oktaamplify-dev-150457-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::544941453660:role/amplify-oktaamplify-dev-150457-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-oktaamplify-dev-150457-deployment",
+      "UnauthRoleName": "amplify-oktaamplify-dev-150457-unauthRole",
+      "StackName": "amplify-oktaamplify-dev-150457",
+      "StackId": "arn:aws:cloudformation:us-west-2:544941453660:stack/amplify-oktaamplify-dev-150457/f6aba450-d2cb-11eb-8c8a-02881debe6b9",
+      "AmplifyAppId": "d2sdqscxscqaw7"
+    },
+    "categories": {
+      "auth": {
+        "oktaamplifyb6626b44": {}
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "auth": {
+    "oktaamplifyb6626b44": {
+      "service": "Cognito",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false
+    }
+  }
+}
