@@ -1,0 +1,10 @@
+{
+    "domain": "werberm.auth.us-west-2.amazoncognito.com",
+    "scope": [
+      "email",
+      "openid"
+    ],
+    "redirectSignIn": "http://localhost:3000",
+    "redirectSignOut": "http://localhost:3000",
+    "responseType": "token"
+}

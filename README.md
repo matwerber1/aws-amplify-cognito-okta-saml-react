@@ -1,70 +1,61 @@
-# Getting Started with Create React App
+# Cognito User Pool with Okta SAML identity provider and AWS Amplify (ReactJS)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project demonstrates how you can use Okta as a SAML identity provider for a Cognito User Pool along with the AWS Amplify authentication library. 
 
-## Available Scripts
+## Credits
 
-In the project directory, you can run:
+Virtually all of this solution is based on the blog below: 
 
-### `yarn start`
+* https://medium.com/@georgemccreadie/introduction-to-using-aws-cognito-hosted-ui-with-amplify-js-4711cf4f925a
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Notes
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+1. My understanding (I could be wrong) is that you must use the Cognito hosted UI for SAML identity providers. With Amplify, this means that you must redirect to the hosted Cognito UI, which will then in-turn redirect to your SAML provider's login page and finally redirect to back to your Amplify application. 
 
-### `yarn test`
+2. The Amplify CLI does not currently provide out-of-the-box support for configuring a custom SAML or OAuth provider. This means that you must either (a) customize the Cognito User Pool created by the Amplify CLI or (b) create and configure a User Pool outside of the Amplify CLI. In this project, I used `amplify add auth` with the default configuration but afterward manually configured Okta as a SAML provider. 
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+3. The Amplify CLI automatically creates an `aws-exports.js` file that contains, among other things, your Cognito user pool information. This file gets overwritten if you re-run certain Amplify CLI commands. Since we need to customize the file outside of the CLI in order to make the `Auth` library work correctly, we instead will create our own `awsauth.json` and `awsconfig.json` files. 
 
-### `yarn build`
+## Pre-requisities
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+You must already have a Cognito User Pool properly configured with Okta as a SAML provider. 
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+I followed the guide here: 
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+* https://aws.amazon.com/premiumsupport/knowledge-center/cognito-okta-saml-identity-provider/
 
-### `yarn eject`
+## Screenshots
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Documentation is light. I'm showing screenshots below as a shortcut: 
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+You will need to create an app client for Okta within your user pool. Cognito will not allow redirects to any URLs not explicitly added to the list shown: 
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+![](screenshots/appclient.png)
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+[As described in this guide](https://aws.amazon.com/premiumsupport/knowledge-center/cognito-okta-saml-identity-provider/), you must set proper attribute mappings between Okta and Cognito: 
 
-## Learn More
+![](screenshots/attribute-map.png)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+You will need to configure a custom domain for your hosted UI: 
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+![](screenshots/domain.png)
 
-### Code Splitting
+[As described in this guide](https://aws.amazon.com/premiumsupport/knowledge-center/cognito-okta-saml-identity-provider/), you need to configure a SAML provider for Okta. 
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+![](screenshots/saml.png)
 
-### Analyzing the Bundle Size
+From your Amplify app, we use the `Auth.federatedSignIn()` method to redirect to the hosted UI:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+![](screenshots/login1.png)
 
-### Making a Progressive Web App
+The hosted UI shows the allowed sign-in methods you configured in your App Client settings (in my case, only Okta):
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+![](screenshots/login2.png)
 
-### Advanced Configuration
+The hosted UI redirects to Okta for login: 
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+![](screenshots/login3.png)
 
-### Deployment
+After logging in to Okta, the hosted UI redirects us to our Amplify project: 
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+![](screenshots/login4.png)
